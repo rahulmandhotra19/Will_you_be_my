@@ -87,7 +87,8 @@
       padding: 14px 34px;
       font-size: 20px;
       cursor: pointer;
-      transition: transform 0.2s ease;
+      transition: transform 0.2s ease, left 0.12s ease, top 0.12s ease;
+      white-space: nowrap;
     }
 
     #yes {
@@ -109,6 +110,7 @@
       top: 78px;
       left: 20%;
       border: 2px solid #f0bfd0;
+      z-index: 12;
     }
 
     .heart {
@@ -213,7 +215,10 @@
     const finalScreen = document.getElementById("finalScreen");
 
     const text = "I have something special to ask you... ❤️";
+    const texts = ["No 😜", "Pakad ke dikha 😏", "Nahi milega 😂", "Try again 😈"];
+
     let i = 0;
+    let noMoveCount = 0;
 
     gift.onclick = () => {
       giftScreen.style.display = "none";
@@ -230,27 +235,46 @@
         setTimeout(() => {
           messageBox.style.display = "none";
           mainBox.style.display = "block";
+          resetNoButton();
         }, 900);
       }
     }
 
+    function resetNoButton() {
+      noBtn.style.position = "absolute";
+      noBtn.style.left = "20%";
+      noBtn.style.top = "78px";
+      noBtn.innerText = "No 🙈";
+    }
+
     function moveNo() {
-      const box = document.querySelector(".buttons");
-      const maxX = box.clientWidth - noBtn.offsetWidth;
-      const maxY = box.clientHeight - noBtn.offsetHeight;
+      if (mainBox.style.display !== "block") return;
 
-      const x = Math.random() * maxX;
-      const y = Math.random() * maxY;
+      const padding = 12;
+      const safeTop = 20;
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
 
-      noBtn.style.left = `${x}px`;
-      noBtn.style.top = `${y}px`;
+      const maxX = viewportWidth - noBtn.offsetWidth - padding;
+      const maxY = viewportHeight - noBtn.offsetHeight - padding;
+
+      const randomX = Math.max(padding, Math.random() * maxX);
+      const randomY = Math.max(safeTop, Math.random() * maxY);
+
+      noBtn.style.position = "fixed";
+      noBtn.style.left = `${randomX}px`;
+      noBtn.style.top = `${randomY}px`;
+
+      noBtn.innerText = texts[noMoveCount % texts.length];
+      noMoveCount++;
     }
 
     noBtn.addEventListener("mouseenter", moveNo);
+
     noBtn.addEventListener("touchstart", (e) => {
       e.preventDefault();
       moveNo();
-    });
+    }, { passive: false });
 
     yesBtn.addEventListener("click", () => {
       mainBox.style.display = "none";
